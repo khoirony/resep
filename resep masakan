@@ -1,0 +1,71 @@
+resep masakan
+
+1. tampilkan resep dengan like terbanyak sampai tersedikit beserta jumlah likenya
+SELECT
+	resep.nama_resep,
+   	COUNT(suka.id_suka) AS jumlah_like
+FROM resep, suka
+WHERE resep.id_resep = suka.id_resep
+GROUP BY resep.id_resep
+ORDER BY jumlah_like DESC;
+
+2. tampilkan resep dengan kategori berkuah yang memiliki like terbanyak dan jumlah likenya
+SELECT
+	resep.nama_resep,
+	kategori.nama_kategori,
+	COUNT(suka.id_suka) AS jumlah_like
+FROM resep, suka, mengkategorikan, kategori
+WHERE resep.id_resep = suka.id_resep 
+AND resep.id_resep = mengkategorikan.id_resep
+AND mengkategorikan.id_kategori = kategori.id_kategori
+AND kategori.nama_kategori = "Berkuah"
+GROUP BY resep.id_resep, mengkategorikan.id_kategori
+ORDER BY jumlah_like DESC;
+
+3. tampilkan nama dan role chef yang memiliki like terbanyak beserta jumlah likenya
+SELECT
+	user.nama,
+	role.nama_role AS sebagai,
+	COUNT(suka.id_suka) AS jumlah_like
+FROM user, resep, suka, role
+WHERE user.id_user = resep.id_user 
+AND resep.id_resep = suka.id_resep
+AND user.id_role = role.id_role
+AND role.nama_role = 'Chef'
+GROUP BY resep.id_user
+ORDER BY jumlah_like DESC;
+
+4. tampilkan chef laki-laki yang memiliki rating terbanyak beserta jumlah rating
+SELECT
+	user.nama,
+    role.nama_role AS sebagai,
+    round(SUM(komentar.rating)/COUNT(komentar.id_komentar),2) AS jumlah_rating
+FROM user, resep, komentar, role
+WHERE user.id_user = resep.id_user 
+AND resep.id_resep = komentar.id_resep
+AND user.id_role = role.id_role
+AND role.nama_role = 'Chef'
+AND user.gender = 'Perempuan'
+GROUP BY user.id_user
+ORDER BY jumlah_rating DESC;
+
+5. tampilkan pencari resep dan resep yang disukai
+SELECT
+	user.nama,
+	resep.nama_resep
+FROM user, suka, resep
+WHERE user.id_user = suka.id_user 
+AND resep.id_resep = suka.id_resep
+ORDER BY user.nama ASC;
+
+6. tampilkan semua resep dengan kesulitan mudah dengan urutan rating tertinggi - terendah 
+SELECT
+	resep.nama_resep,
+    kesulitan.nama_level,
+    round(SUM(komentar.rating)/COUNT(komentar.id_komentar),2) AS jumlah_rating
+FROM resep, komentar, kesulitan
+WHERE resep.id_resep = komentar.id_resep
+AND resep.id_kesulitan = kesulitan.id_kesulitan
+AND kesulitan.nama_level = 'Mudah'
+GROUP BY resep.id_resep
+ORDER BY jumlah_rating DESC;
